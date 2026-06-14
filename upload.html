@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Upload</title>
+
+<style>
+body {
+    margin: 0;
+    background-image: url("backround.png");
+    background-repeat: repeat;
+    background-size: auto;
+    min-height: 100vh;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Upload Project</h2>
+
+  <input id="title" placeholder="Title">
+
+  <h4>Thumbnail</h4>
+  <div class="drop" id="thumbDrop">Drop thumbnail or click</div>
+  <input type="file" id="thumbInput" accept=".png,.jpg,.jpeg,.bmp" hidden>
+
+  <h4>Main File</h4>
+  <div class="drop" id="fileDrop">Drop .tstlt/.ma2d1/etc or click</div>
+  <input type="file" id="fileInput" accept=".ma2d1,.ma3d1,.tstlt,.psprm,.tsbgl" hidden>
+
+  <button onclick="upload()">Upload</button>
+</div>
+
+<script>
+const thumbDrop = document.getElementById("thumbDrop");
+const fileDrop = document.getElementById("fileDrop");
+
+const thumbInput = document.getElementById("thumbInput");
+const fileInput = document.getElementById("fileInput");
+
+let thumbFile = null;
+let mainFile = null;
+
+// helpers
+function bindDrop(drop, input, callback) {
+  drop.onclick = () => input.click();
+
+  drop.addEventListener("dragover", e => {
+    e.preventDefault();
+    drop.classList.add("dragover");
+  });
+
+  drop.addEventListener("dragleave", () => {
+    drop.classList.remove("dragover");
+  });
+
+  drop.addEventListener("drop", e => {
+    e.preventDefault();
+    drop.classList.remove("dragover");
+    callback(e.dataTransfer.files[0]);
+  });
+
+  input.addEventListener("change", () => {
+    callback(input.files[0]);
+  });
+}
+
+bindDrop(thumbDrop, thumbInput, file => {
+  thumbFile = file;
+  thumbDrop.innerText = "Thumbnail: " + file.name;
+});
+
+bindDrop(fileDrop, fileInput, file => {
+  mainFile = file;
+  fileDrop.innerText = "File: " + file.name;
+});
+
+function upload() {
+  const title = document.getElementById("title").value;
+
+  if (!title) return alert("Enter title");
+  if (!thumbFile) return alert("Missing thumbnail");
+  if (!mainFile) return alert("Missing main file");
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("thumbnail", thumbFile);
+  formData.append("file", mainFile);
+
+  fetch("/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(r => r.text())
+  .then(msg => alert(msg))
+  .catch(() => alert("Upload failed"));
+}
+</script>
+
+</body>
+</html>

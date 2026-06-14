@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+
+<style>
+body {
+    margin: 0;
+    background-image: url("backround.png");
+    background-repeat: repeat;
+    background-size: auto;
+    min-height: 100vh;
+    font-family: Arial;
+}
+
+/* logo */
+#logo {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 555px;
+    height: auto;
+    z-index: 1000;
+}
+
+/* upload button */
+#upload-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #0078ff;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+#upload-btn:hover {
+    background-color: #005fcc;
+}
+
+/* gallery */
+#gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 250px 30px 50px 30px;
+}
+
+.card {
+    background: rgba(0,0,0,0.75);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.card h3 {
+    color: white;
+    font-size: 16px;
+    margin: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<img src="logo.png" id="logo" alt="Logo">
+
+<a href="upload.html">
+    <button id="upload-btn">Upload</button>
+</a>
+
+<!-- GALLERY -->
+<div id="gallery"></div>
+
+<script>
+async function loadGallery() {
+    const res = await fetch("/uploads/data.json");
+    const data = await res.json();
+
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
+
+    data.reverse().forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const img = document.createElement("img");
+        img.src = "/uploads/" + item.thumbnail;
+
+        const title = document.createElement("h3");
+        title.innerText = item.title;
+
+        card.appendChild(img);
+        card.appendChild(title);
+
+        // click ? download main file
+        card.onclick = () => {
+            const a = document.createElement("a");
+            a.href = "/uploads/" + item.file;
+            a.download = item.file;
+            a.click();
+        };
+
+        gallery.appendChild(card);
+    });
+}
+
+loadGallery();
+</script>
+
+</body>
+</html>
