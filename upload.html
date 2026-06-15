@@ -6,11 +6,39 @@
 
 <style>
 body {
-    margin: 0;
-    background-image: url("backround.png");
-    background-repeat: repeat;
-     background-size: auto;
-    min-height: 100vh;n 
+    font-family: Arial;
+    background: #111;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+.box {
+    background: #1c1c1c;
+    padding: 20px;
+    border-radius: 12px;
+    width: 360px;
+}
+
+input, button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.drop {
+    border: 2px dashed #4da3ff;
+    padding: 25px;
+    text-align: center;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.drop.dragover {
+    background: rgba(77,163,255,0.2);
 }
 </style>
 </head>
@@ -18,83 +46,80 @@ body {
 <body>
 
 <div class="box">
-  <h2>Upload Project</h2>
+    <h2>Upload File</h2>
 
-  <input id="title" placeholder="Title">
+    <input id="title" placeholder="Title">
 
-  <h4>Thumbnail</h4>
-  <div class="drop" id="thumbDrop">Select a thumbnail for your project</div>
-  <input type="file" id="thumbInput" accept=".png,.jpg,.jpeg,.bmp" hidden>
+    <div class="drop" id="fileDrop">
+        Drop file here or click to select
+    </div>
 
-  <h4>Main File</h4>
-  <div class="drop" id="fileDrop">Select the file you want to upload.</div>
-  <input type="file" id="fileInput" accept=".ma2d1,.ma3d1,.tstlt,.psprm,.tsbgl,.crsd,.card,.tsanm,.MA2D1,.MA3D1,.TSTLT,.PSPRM,.TSBGL,.CRSD,.CARD,.TSANM" hidden>
+    <input type="file"
+        id="fileInput"
+        accept=".ma2d1,.ma3d1,.tstlt,.psprm,.tsbgl,.crsd,.card,.tsanm"
+        hidden>
 
-  <button onclick="upload()">Upload</button>
+    <button onclick="upload()">Upload</button>
 </div>
 
 <script>
-const thumbDrop = document.getElementById("thumbDrop"); 
 const fileDrop = document.getElementById("fileDrop");
-
-const thumbInput = document.getElementById("thumbInput");
 const fileInput = document.getElementById("fileInput");
 
-let thumbFile = null;
 let mainFile = null;
 
-// helpers
-function bindDrop(drop, input, callback) {
-  drop.onclick = () => input.click();
+fileDrop.onclick = () => fileInput.click();
 
-  drop.addEventListener("dragover", e => {
+fileDrop.addEventListener("dragover", e => {
     e.preventDefault();
-    drop.classList.add("dragover");
-  });
+    fileDrop.classList.add("dragover");
+});
 
-  drop.addEventListener("dragleave", () => {
-    drop.classList.remove("dragover");
-  });
+fileDrop.addEventListener("dragleave", () => {
+    fileDrop.classList.remove("dragover");
+});
 
-  drop.addEventListener("drop", e => {
+fileDrop.addEventListener("drop", e => {
     e.preventDefault();
-    drop.classList.remove("dragover");
-    callback(e.dataTransfer.files[0]);
-  });
+    fileDrop.classList.remove("dragover");
+    handleFile(e.dataTransfer.files[0]);
+});
 
-  input.addEventListener("change", () => {
-    callback(input.files[0]);
-  });
+fileInput.addEventListener("change", () => {
+    handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+    if (!file) return;
+
+    mainFile = file;
+    fileDrop.innerText = "Selected: " + file.name;
 }
 
-bindDrop(thumbDrop, thumbInput, file => {
-  thumbFile = file;
-  thumbDrop.innerText = "Thumbnail: " + file.name;
-});
-
-bindDrop(fileDrop, fileInput, file => {
-  mainFile = file;
-  fileDrop.innerText = "File: " + file.name;
-});
-
 function upload() {
-  const title = document.getElementById("title").value;
+    const title = document.getElementById("title").value;
 
-  if (!title) return alert("Enter title");
-  if (!mainFile) return alert("Missing main file");
+    if (!title) {
+        alert("Enter a title");
+        return;
+    }
 
-  const formData = new FormData();
-  formData.append("title", title);
-  formData.append("thumbnail", thumbFile);
-  formData.append("file", mainFile);
+    if (!mainFile) {
+        alert("Select a file");
+        return;
+    }
 
-  fetch("/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(r => r.text())
-  .then(msg => alert(msg))
-  .catch(() => alert("Upload failed"));
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("file", mainFile);
+
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(r => r.text())
+    .then(msg => alert(msg))
+    .catch(() => alert("Upload failed"));
 }
 </script>
 
