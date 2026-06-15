@@ -65,27 +65,39 @@ app.post(
         const thumb = req.files?.thumbnail?.[0];
         const main = req.files?.file?.[0];
 
-        console.log("========== UPLOAD ==========");
+        console.log("Upload:");
         console.log("Title:", title);
-        console.log("Thumbnail:", thumb?.originalname);
-        console.log("Main File:", main?.originalname);
-        console.log("============================");
+        console.log("Thumbnail:", thumb?.originalname || "NONE");
+        console.log("Main:", main?.originalname);
 
-        if (!title || !thumb || !main) {
-            return res.status(400).send("Missing data");
+        if (!title || !main) {
+            return res.status(400).send("Missing title or file");
         }
 
-        if (!checkExt(thumb, allowedThumb)) {
-            return res.status(400).send("Invalid thumbnail type");
-        }
+        const mainExt = path.extname(main.originalname).slice(1).toLowerCase();
 
-        if (!checkExt(main, allowedMain)) {
+        const allowedMain = ["ma2d1", "ma3d1", "tstlt", "psprm", "tsbgl", "crsd", "card", "tsanm"];
+
+        if (!allowedMain.includes(mainExt)) {
             return res.status(400).send("Invalid main file type");
+        }
+
+        let thumbName = null;
+
+        if (thumb) {
+            const allowedThumb = ["png", "jpg", "jpeg", "bmp"];
+            const thumbExt = path.extname(thumb.originalname).slice(1).toLowerCase();
+
+            if (!allowedThumb.includes(thumbExt)) {
+                return res.status(400).send("Invalid thumbnail type");
+            }
+
+            thumbName = thumb.filename;
         }
 
         const entry = {
             title,
-            thumbnail: thumb.filename,
+            thumbnail: thumbName, // can be null now
             file: main.filename,
             time: Date.now()
         };
@@ -97,28 +109,15 @@ app.post(
         if (fs.existsSync(dbFile)) {
             try {
                 db = JSON.parse(fs.readFileSync(dbFile, "utf8"));
-            } catch (err) {
-                console.log("Couldn't read data.json, creating new one.");
+            } catch {
                 db = [];
             }
         }
 
         db.push(entry);
 
-        fs.writeFileSync(
-            dbFile,
-            JSON.stringify(db, null, 2)
-        );
-
-        console.log("Upload saved successfully.");
+        fs.writeFileSync(dbFile, JSON.stringify(db, null, 2));
 
         res.send("Upload successful!");
     }
 );
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Running on http://localhost:${PORT}`);
-    console.log(`Project folder: ${__dirname}`);
-});
