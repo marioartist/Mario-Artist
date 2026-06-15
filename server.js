@@ -14,13 +14,13 @@ app.use(express.static(__dirname));
 // Serve uploads folder publicly
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const allowedMain = ["ma2d1", "ma3d1", "tstlt", "psprm", "tsbgl"];
-const allowedThumb = ["png", "jpg", "jpeg", "bmp"];
-
 // Create uploads folder if it doesn't exist
 if (!fs.existsSync("uploads")) {
     fs.mkdirSync("uploads");
 }
+
+const allowedMain = ["ma2d1", "ma3d1", "tstlt", "psprm", "tsbgl"];
+const allowedThumb = ["png", "jpg", "jpeg", "bmp"];
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -38,10 +38,23 @@ function checkExt(file, allowed) {
         .slice(1)
         .toLowerCase();
 
+    console.log("========== FILE CHECK ==========");
+    console.log("Filename:", file.originalname);
+    console.log("Extension:", ext);
+    console.log("Allowed:", allowed);
+    console.log("Passes:", allowed.includes(ext));
+    console.log("================================");
+
     return allowed.includes(ext);
 }
 
-app.post("/upload",
+// Homepage
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.post(
+    "/upload",
     upload.fields([
         { name: "thumbnail", maxCount: 1 },
         { name: "file", maxCount: 1 }
@@ -51,6 +64,12 @@ app.post("/upload",
         const title = req.body.title;
         const thumb = req.files?.thumbnail?.[0];
         const main = req.files?.file?.[0];
+
+        console.log("========== UPLOAD ==========");
+        console.log("Title:", title);
+        console.log("Thumbnail:", thumb?.originalname);
+        console.log("Main File:", main?.originalname);
+        console.log("============================");
 
         if (!title || !thumb || !main) {
             return res.status(400).send("Missing data");
@@ -78,7 +97,8 @@ app.post("/upload",
         if (fs.existsSync(dbFile)) {
             try {
                 db = JSON.parse(fs.readFileSync(dbFile, "utf8"));
-            } catch {
+            } catch (err) {
+                console.log("Couldn't read data.json, creating new one.");
                 db = [];
             }
         }
@@ -90,17 +110,15 @@ app.post("/upload",
             JSON.stringify(db, null, 2)
         );
 
+        console.log("Upload saved successfully.");
+
         res.send("Upload successful!");
     }
 );
-
-// Homepage
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`Running on http://localhost:${PORT}`);
+    console.log(`Project folder: ${__dirname}`);
 });
