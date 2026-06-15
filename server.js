@@ -19,7 +19,7 @@ if (!fs.existsSync("uploads")) {
     fs.mkdirSync("uploads");
 }
 
-const allowedMain = ["ma2d1", "ma3d1", "tstlt", "psprm", "tsbgl"];
+const allowedMain = ["ma2d1", "ma3d1", "tstlt", "psprm", "tsbgl", "crsd", "card", "tsanm"];
 const allowedThumb = ["png", "jpg", "jpeg", "bmp"];
 
 const storage = multer.diskStorage({
