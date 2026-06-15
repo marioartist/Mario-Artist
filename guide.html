@@ -81,54 +81,12 @@ body {
 
 <body>
 
-<img src="logo.png" id="logo" alt="Logo">
-
-<a href="upload.html">
-    <button id="upload-btn">Upload</button>
+<a href="https://github.com/LuigiBlood/mfs_manager/releases">
+    <button id="msf-btn">64DD MFS Manager</button>
 </a>
 
-<a href="guide.html">
-    <button id="guide-btn">Guide</button>
+<a href="index.html">
+    <button id="gback-btn">Back</button>
 </a>
 
-<!-- GALLERY -->
-<div id="gallery"></div>
-
-<script>
-async function loadGallery() {
-    const res = await fetch("/uploads/data.json");
-    const data = await res.json();
-
-    const gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
-
-    data.reverse().forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const img = document.createElement("img");
-        img.src = "/uploads/" + item.thumbnail;
-
-        const title = document.createElement("h3");
-        title.innerText = item.title;
-
-        card.appendChild(img);
-        card.appendChild(title);
-
-        // click ? download main file
-        card.onclick = () => {
-            const a = document.createElement("a");
-            a.href = "/uploads/" + item.file;
-            a.download = item.file;
-            a.click();
-        };
-
-        gallery.appendChild(card);
-    });
-}
-
-loadGallery();
-</script>
-
-</body>
-</html>
+<h2>To get your projects out of your game ROM, and into your PC's storage, you must download 64DD MFS Manager, open mfs_gui.exe, choose open, and choose your .ndd ROM or your .ram save file. Choose the container you saved your project in, hover over it with you mouse, and right click. Then click export file and choose a location to save your project file, then go to the home page of this website and choose upload, then choose the file, title, and thumbnail for your project.

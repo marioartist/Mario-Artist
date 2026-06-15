@@ -9,8 +9,8 @@ body {
     margin: 0;
     background-image: url("backround.png");
     background-repeat: repeat;
-    background-size: auto;
-    min-height: 100vh;
+     background-size: auto;
+    min-height: 100vh;n 
 }
 </style>
 </head>
@@ -23,18 +23,18 @@ body {
   <input id="title" placeholder="Title">
 
   <h4>Thumbnail</h4>
-  <div class="drop" id="thumbDrop">Drop thumbnail or click</div>
+  <div class="drop" id="thumbDrop">Select a thumbnail for your project</div>
   <input type="file" id="thumbInput" accept=".png,.jpg,.jpeg,.bmp" hidden>
 
   <h4>Main File</h4>
-  <div class="drop" id="fileDrop">Drop .tstlt/.ma2d1/etc or click</div>
-  <input type="file" id="fileInput" accept=".ma2d1,.ma3d1,.tstlt,.psprm,.tsbgl" hidden>
+  <div class="drop" id="fileDrop">Select the file you want to upload.</div>
+  <input type="file" id="fileInput" accept=".ma2d1,.ma3d1,.tstlt,.psprm,.tsbgl,.crsd,.card" hidden>
 
   <button onclick="upload()">Upload</button>
 </div>
 
 <script>
-const thumbDrop = document.getElementById("thumbDrop");
+const thumbDrop = document.getElementById("thumbDrop"); 
 const fileDrop = document.getElementById("fileDrop");
 
 const thumbInput = document.getElementById("thumbInput");
@@ -81,7 +81,6 @@ function upload() {
   const title = document.getElementById("title").value;
 
   if (!title) return alert("Enter title");
-  if (!thumbFile) return alert("Missing thumbnail");
   if (!mainFile) return alert("Missing main file");
 
   const formData = new FormData();
